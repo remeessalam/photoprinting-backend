@@ -109,7 +109,7 @@ router.post("/create", async (req, res) => {
 });
 
 // get cart
-router.get("/cart/:userId", async (req, res) => {
+router.get("/get/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
@@ -126,7 +126,7 @@ router.get("/cart/:userId", async (req, res) => {
 });
 
 // update cart
-router.put("/cart/:cartItemId", async (req, res) => {
+router.put("/update/:cartItemId", async (req, res) => {
   try {
     const cartItemId = req.params.cartItemId;
     const { size, quantity, imageFile, amount, category, brand } = req.body;
@@ -153,7 +153,7 @@ router.put("/cart/:cartItemId", async (req, res) => {
 });
 
 // remove item from cart
-router.delete("/cart/:cartItemId", async (req, res) => {
+router.delete("/delete/:cartItemId", async (req, res) => {
   try {
     const cartItemId = req.params.cartItemId;
 
