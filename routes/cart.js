@@ -44,7 +44,6 @@ const validateFieldsByCategory = (category, data) => {
   return null;
 };
 // add to cart
-
 router.post("/create", upload.single("imageFile"), async (req, res) => {
   try {
     const { userId, size, quantity, amount, category, brand } = req.body;
@@ -114,6 +113,24 @@ router.post("/create", upload.single("imageFile"), async (req, res) => {
   } catch (err) {
     console.error("Error:", err);
     return res.status(500).json({ status: false, error: "error", err: err });
+  }
+});
+
+// cartitem get by id
+router.get("/cartitembyid/:cartItemId", async (req, res) => {
+  const cartItemId = req.params.cartItemId;
+
+  try {
+    const cartItem = await CartItem.findById(cartItemId);
+
+    if (!cartItem) {
+      return res.status(404).json({ status: false, error: "no cart founded" });
+    }
+
+    return res.status(200).json({ status: true, cartItem });
+  } catch (err) {
+    console.error("Error:", err);
+    return res.status(500).json({ error: "error" });
   }
 });
 
