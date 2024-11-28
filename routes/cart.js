@@ -141,6 +141,11 @@ router.put(
       const { size, quantity, imageFile, amount, category, brand } = req.body;
       const file = req.file;
       console.log(req.body);
+
+      const validationError = validateFieldsByCategory(category, req.body);
+      if (validationError) {
+        return res.status(400).json({ error: validationError });
+      }
       const cartItem = await CartItem.findById(cartItemId);
       if (!cartItem) {
         return res.status(404).json({ error: "cartitem not found" });
