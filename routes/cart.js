@@ -141,7 +141,7 @@ router.put(
       const { size, quantity, imageFile, amount, category, brand } = req.body;
       const file = req.file;
       console.log(req.body);
-
+      let imageUrl;
       const validationError = validateFieldsByCategory(category, req.body);
       if (validationError) {
         return res.status(400).json({ error: validationError });
@@ -166,14 +166,17 @@ router.put(
 
           uploadStream.end(file.buffer);
         });
-
-      const uploadResult = await uploadPromise();
-      const imageUrl = uploadResult.secure_url;
-
+      if (file) {
+        const uploadResult = await uploadPromise();
+        imageUrl = uploadResult.secure_url;
+        console.log("new image added");
+      } else {
+        imageUrl = cartItem.imageFile;
+      }
       if (category) cartItem.category = category;
       if (size) cartItem.size = size;
       if (quantity) cartItem.quantity = quantity;
-      if (imageFile) cartItem.imageFile = imageUrl;
+      if (file) cartItem.imageFile = imageUrl;
       if (amount) cartItem.amount = amount;
       if (brand) cartItem.brand = brand;
 
