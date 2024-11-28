@@ -132,31 +132,55 @@ router.get("/get/:userId", async (req, res) => {
 });
 
 // update cart
-router.put("/update/:cartItemId", async (req, res) => {
-  try {
-    const cartItemId = req.params.cartItemId;
-    const { size, quantity, imageFile, amount, category, brand } = req.body;
+router.put(
+  "/update/:cartItemId",
+  upload.single("imageFile"),
+  async (req, res) => {
+    try {
+      const cartItemId = req.params.cartItemId;
+      const { size, quantity, imageFile, amount, category, brand } = req.body;
+      const file = req.file;
+      console.log(req.body);
+      const cartItem = await CartItem.findById(cartItemId);
+      if (!cartItem) {
+        return res.status(404).json({ error: "cartitem not found" });
+      }
 
-    const cartItem = await CartItem.findById(cartItemId);
-    if (!cartItem) {
-      return res.status(404).json({ error: "cartitem not found" });
+      const uploadPromise = () =>
+        new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              public_id: `cart_items/${cartItem._id}_${Date.now()}`,
+              folder: "cart_items",
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+
+          uploadStream.end(file.buffer);
+        });
+
+      const uploadResult = await uploadPromise();
+      const imageUrl = uploadResult.secure_url;
+
+      if (category) cartItem.category = category;
+      if (size) cartItem.size = size;
+      if (quantity) cartItem.quantity = quantity;
+      if (imageFile) cartItem.imageFile = imageUrl;
+      if (amount) cartItem.amount = amount;
+      if (brand) cartItem.brand = brand;
+
+      await cartItem.save();
+
+      return res.status(200).json({ message: "cart item updated", cartItem });
+    } catch (err) {
+      console.error("erro in updateing:", err);
+      return res.status(500).json({ error: "error" });
     }
-
-    if (category) cartItem.category = category;
-    if (size) cartItem.size = size;
-    if (quantity) cartItem.quantity = quantity;
-    if (imageFile) cartItem.imageFile = imageFile;
-    if (amount) cartItem.amount = amount;
-    if (brand) cartItem.brand = brand;
-
-    await cartItem.save();
-
-    return res.status(200).json({ message: "cart item updated", cartItem });
-  } catch (err) {
-    console.error("erro in updateing:", err);
-    return res.status(500).json({ error: "error" });
   }
-});
+);
 
 // remove item from cart
 router.delete("/delete/:cartItemId", async (req, res) => {
@@ -176,7 +200,7 @@ router.delete("/delete/:cartItemId", async (req, res) => {
     user.cartItems.pull(cartItemId);
     await user.save();
 
-    await cartItem.remove();
+    await CartItem.deleteOne({ _id: cartItemId });
 
     return res.status(200).json({ message: "cart item deleted" });
   } catch (err) {

@@ -14,7 +14,7 @@ const cartItemSchema = new mongoose.Schema(
     quantity: {
       type: Number,
       // required: true,
-      min: 1, // Ensure quantity is at least 1
+      // min: 1, // Ensure quantity is at least 1
     },
     imageFile: {
       type: String, // URL or path to the image file
