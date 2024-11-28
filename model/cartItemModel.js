@@ -4,20 +4,17 @@ const cartItemSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the User model
+      ref: "User",
       required: true,
     },
     size: {
       type: String,
-      // required: true,
     },
     quantity: {
       type: Number,
-      // required: true,
-      // min: 1, // Ensure quantity is at least 1
     },
     imageFile: {
-      type: String, // URL or path to the image file
+      type: String,
       required: true,
     },
     amount: {
@@ -30,7 +27,6 @@ const cartItemSchema = new mongoose.Schema(
     },
     brand: {
       type: String,
-      // required: true,
     },
   },
   { timestamps: true }
