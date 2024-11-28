@@ -11,7 +11,7 @@ const cartItemSchema = new mongoose.Schema(
       type: String,
     },
     quantity: {
-      type: Number,
+      type: mongoose.Schema.Types.Mixed,
     },
     imageFile: {
       type: String,

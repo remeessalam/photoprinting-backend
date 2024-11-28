@@ -160,7 +160,7 @@ router.put(
   async (req, res) => {
     try {
       const cartItemId = req.params.cartItemId;
-      const { size, quantity, imageFile, amount, category, brand } = req.body;
+      const { size, quantity, amount, category, brand } = req.body;
       const file = req.file;
       console.log(req.body);
       let imageUrl;
