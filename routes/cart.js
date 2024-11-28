@@ -52,12 +52,14 @@ router.post("/create", upload.single("imageFile"), async (req, res) => {
     const file = req.file;
 
     if (!file) {
-      return res.status(400).json({ error: "No image file uploaded" });
+      return res
+        .status(400)
+        .json({ status: false, error: "No image file uploaded" });
     }
 
     const validationError = validateFieldsByCategory(category, req.body);
     if (validationError) {
-      return res.status(400).json({ error: validationError });
+      return res.status(400).json({ status: false, error: validationError });
     }
 
     const uploadPromise = () =>
@@ -94,7 +96,7 @@ router.post("/create", upload.single("imageFile"), async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ status: false, error: "User not found" });
     }
 
     user.cartItems.push(newCartItem._id);
@@ -105,12 +107,13 @@ router.post("/create", upload.single("imageFile"), async (req, res) => {
     );
     console.log(cartItem, "cart item created");
     return res.status(201).json({
+      status: true,
       message: "Item added to cart successfully",
       cartItem: cartItem,
     });
   } catch (err) {
     console.error("Error:", err);
-    return res.status(500).json({ error: "error", err: err });
+    return res.status(500).json({ status: false, error: "error", err: err });
   }
 });
 
@@ -121,13 +124,15 @@ router.get("/get/:userId", async (req, res) => {
 
     const user = await User.findById(userId).populate("cartItems");
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ status: false, error: "User not found" });
     }
 
-    return res.status(200).json({ cartItems: user.cartItems });
+    return res.status(200).json({ status: true, cartItems: user.cartItems });
   } catch (err) {
     console.error("Error fetching cart items:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json({ status: false, error: "Internal server error" });
   }
 });
 
@@ -144,11 +149,13 @@ router.put(
       let imageUrl;
       const validationError = validateFieldsByCategory(category, req.body);
       if (validationError) {
-        return res.status(400).json({ error: validationError });
+        return res.status(400).json({ status: false, error: validationError });
       }
       const cartItem = await CartItem.findById(cartItemId);
       if (!cartItem) {
-        return res.status(404).json({ error: "cartitem not found" });
+        return res
+          .status(404)
+          .json({ status: false, error: "cartitem not found" });
       }
 
       const uploadPromise = () =>
@@ -182,10 +189,12 @@ router.put(
 
       await cartItem.save();
 
-      return res.status(200).json({ message: "cart item updated", cartItem });
+      return res
+        .status(200)
+        .json({ status: true, message: "cart item updated", cartItem });
     } catch (err) {
       console.error("erro in updateing:", err);
-      return res.status(500).json({ error: "error" });
+      return res.status(500).json({ status: false, error: "error" });
     }
   }
 );
@@ -197,12 +206,14 @@ router.delete("/delete/:cartItemId", async (req, res) => {
 
     const cartItem = await CartItem.findById(cartItemId);
     if (!cartItem) {
-      return res.status(404).json({ error: "Cart item not found" });
+      return res
+        .status(404)
+        .json({ status: false, error: "Cart item not found" });
     }
 
     const user = await User.findById(cartItem.userId);
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ status: false, error: "User not found" });
     }
 
     user.cartItems.pull(cartItemId);
@@ -210,10 +221,10 @@ router.delete("/delete/:cartItemId", async (req, res) => {
 
     await CartItem.deleteOne({ _id: cartItemId });
 
-    return res.status(200).json({ message: "cart item deleted" });
+    return res.status(200).json({ status: true, message: "cart item deleted" });
   } catch (err) {
     console.error("err:", err);
-    return res.status(500).json({ error: "error" });
+    return res.status(500).json({ status: false, error: "error" });
   }
 });
 

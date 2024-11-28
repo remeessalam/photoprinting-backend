@@ -11,17 +11,19 @@ router.post("/login", async (req, res) => {
     if (!id) {
       console.log("No browserid provided. Creating a new user.");
       const newUser = await userSchema.create({});
-      return res.status(201).json({ user: newUser });
+      return res.status(201).json({ status: true, user: newUser });
     }
 
     const existingUser = await userSchema.findOne({ _id: id });
     if (existingUser) {
       console.log(id, "old user found");
-      return res.status(200).json({ user: existingUser });
+      return res.status(200).json({ status: true, user: existingUser });
     }
   } catch (err) {
     console.log("error-", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json({ status: false, error: "Internal server error" });
   }
 });
 
