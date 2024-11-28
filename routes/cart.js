@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const CartItem = require("../model/cartItemModel");
 const User = require("../model/userModel");
+require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -53,55 +54,44 @@ router.post("/create", async (req, res) => {
       return res.status(400).json({ error: validationError });
     }
 
-    cloudinary.uploader
-      .upload_stream(
-        {
-          resource_type: "auto",
-          public_id: `cart_items/${userId}_${Date.now()}`,
-          folder: "cart_items/",
-          allowed_formats: ["jpg", "png", "jpeg", "gif"],
-        },
-        async (error, result) => {
-          if (error) {
-            console.error("Cloudinary upload error:", error);
-            return res
-              .status(500)
-              .json({ error: "Error uploading image to Cloudinary" });
-          }
+    const uploadResult = await cloudinary.uploader
+      .upload(file, {
+        public_id: `cart_items/${userId}_${Date.now()}`,
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-          const imageUrl = result.secure_url;
+    const imageUrl = uploadResult.secure_url;
 
-          const newCartItem = new CartItem({
-            userId,
-            size,
-            quantity,
-            imageFile: imageUrl,
-            amount,
-            category,
-            brand,
-          });
+    const newCartItem = new CartItem({
+      userId,
+      size,
+      quantity,
+      imageFile: imageUrl,
+      amount,
+      category,
+      brand,
+    });
 
-          await newCartItem.save();
+    await newCartItem.save();
 
-          const user = await User.findById(userId);
-          if (!user) {
-            return res.status(404).json({ error: "User not found" });
-          }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-          user.cartItems.push(newCartItem._id);
-          await user.save();
+    user.cartItems.push(newCartItem._id);
+    await user.save();
 
-          const cartItem = await CartItem.findById(newCartItem._id).select(
-            "-createdAt -updatedAt"
-          );
-          console.log(cartItem, "cart item created");
-          return res.status(201).json({
-            message: "Item added to cart successfully",
-            cartItem: cartItem,
-          });
-        }
-      )
-      .end(file.buffer);
+    const cartItem = await CartItem.findById(newCartItem._id).select(
+      "-createdAt -updatedAt"
+    );
+    console.log(cartItem, "cart item created");
+    return res.status(201).json({
+      message: "Item added to cart successfully",
+      cartItem: cartItem,
+    });
   } catch (err) {
     console.error("Error:", err);
     return res.status(500).json({ error: "error", err: err });
