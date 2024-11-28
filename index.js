@@ -1,7 +1,7 @@
-const http = require("http");
+// const http = require("http");
 const express = require("express");
 const app = express();
-const server = http.createServer(app);
+// const server = http.createServer(app);
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const user = require("./routes/user");
@@ -24,7 +24,7 @@ mongoose
   .connect(process.env.MONGOURL)
   .then(() => {
     console.log("Database connected");
-    server.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
+    app.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
   })
   .catch((err) => {
     console.error("Error connecting to database:", err);

@@ -3,6 +3,8 @@ const router = express.Router();
 const CartItem = require("../model/cartItemModel");
 const User = require("../model/userModel");
 require("dotenv").config();
+const multer = require("multer");
+
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -10,6 +12,9 @@ cloudinary.config({
   api_key: process.env.API_KEY, // your Cloudinary API key
   api_secret: process.env.API_SECRET, // your Cloudinary API secret
 });
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const validateFieldsByCategory = (category, data) => {
   if (category === "STICKER_PRINTING") {
@@ -39,7 +44,8 @@ const validateFieldsByCategory = (category, data) => {
   return null;
 };
 // add to cart
-router.post("/create", async (req, res) => {
+
+router.post("/create", upload.single("imageFile"), async (req, res) => {
   try {
     const { userId, size, quantity, amount, category, brand } = req.body;
     console.log(req.body);
@@ -54,13 +60,23 @@ router.post("/create", async (req, res) => {
       return res.status(400).json({ error: validationError });
     }
 
-    const uploadResult = await cloudinary.uploader
-      .upload(file, {
-        public_id: `cart_items/${userId}_${Date.now()}`,
-      })
-      .catch((error) => {
-        console.log(error);
+    const uploadPromise = () =>
+      new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            public_id: `cart_items/${userId}_${Date.now()}`,
+            folder: "cart_items",
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+
+        uploadStream.end(file.buffer);
       });
+
+    const uploadResult = await uploadPromise();
 
     const imageUrl = uploadResult.secure_url;
 
