@@ -258,7 +258,7 @@ router.post(
       if (!file && !imageUrl) {
         return res
           .status(400)
-          .json({ status: false, error: "No image file or URL provided" });
+          .json({ status: false, error: "please add image" });
       }
 
       let imageSource;
@@ -267,7 +267,7 @@ router.post(
         const uploadPromise = () =>
           new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
-              { folder: "temp_images" },
+              { folder: "remove_backround" },
               (error, result) => {
                 if (error) return reject(error);
                 resolve(result.secure_url);
@@ -308,11 +308,7 @@ router.post(
                 resolve(filePath);
               });
             } else {
-              reject(
-                new Error(
-                  `PhotoRoom API failed with status code ${res.statusCode}`
-                )
-              );
+              reject(new Error(`failed to remove background${res.statusCode}`));
             }
           });
 
@@ -331,11 +327,11 @@ router.post(
 
       return res.status(200).json({
         status: true,
-        message: "Background removed successfully",
+        message: "background removed successfully",
         processedImageUrl: processedImageUpload.secure_url,
       });
     } catch (error) {
-      console.error("Error in /removebackground:", error);
+      console.error("failed to remove background", error);
       return res.status(500).json({ status: false, error: error.message });
     }
   }
