@@ -268,7 +268,7 @@ router.post(
   upload.single("imageFile"),
   async (req, res) => {
     try {
-      const { imageUrl } = req.body;
+      const { imageUrl, cartItemId } = req.body;
       const file = req.file;
 
       if (!file && !imageUrl) {
@@ -340,6 +340,19 @@ router.post(
       );
 
       fs.unlinkSync(processedImagePath);
+
+      if (cartItemId) {
+        const cartItem = await CartItem.findById(cartItemId);
+
+        if (!cartItem) {
+          return res
+            .status(404)
+            .json({ status: false, error: "cart item not found" });
+        }
+
+        cartItem.imageFile = processedImageUpload.secure_url;
+        await cartItem.save();
+      }
 
       return res.status(200).json({
         status: true,
