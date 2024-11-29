@@ -274,11 +274,12 @@ router.post(
       if (!file && !imageUrl) {
         return res
           .status(400)
-          .json({ status: false, error: "please add image" });
+          .json({ status: false, error: "Please add an image" });
       }
 
       let imageSource;
 
+      // Upload the image file to Cloudinary or use the provided image URL
       if (file) {
         const uploadPromise = () =>
           new Promise((resolve, reject) => {
@@ -296,7 +297,9 @@ router.post(
       } else {
         imageSource = imageUrl;
       }
-      console.log(process.env.PHOTOROOM_API, "thisisphotoroomaoi");
+
+      console.log(process.env.PHOTOROOM_API, "thisisphotoroomapi");
+
       const editParams =
         "background.color=transparent&background.scaling=fill&outputSize=1000x1000&padding=0.1";
       const options = {
@@ -311,20 +314,24 @@ router.post(
         },
       };
 
+      // Process the image via the PhotoRoom API and directly upload it to Cloudinary
       const processedImagePromise = () =>
         new Promise((resolve, reject) => {
+          const cloudinaryUploadStream = cloudinary.uploader.upload_stream(
+            { folder: "processed_images" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result.secure_url); // Return the Cloudinary URL
+            }
+          );
+
           const req = https.request(options, (res) => {
             if (res.statusCode === 200) {
-              const filePath = `processed_image_${Date.now()}.jpg`;
-              const fileStream = fs.createWriteStream(filePath);
-              res.pipe(fileStream);
-
-              fileStream.on("finish", () => {
-                fileStream.close();
-                resolve(filePath);
-              });
+              res.pipe(cloudinaryUploadStream); // Stream directly to Cloudinary
             } else {
-              reject(new Error(`failed to remove background${res.statusCode}`));
+              reject(
+                new Error(`PhotoRoom API failed with status ${res.statusCode}`)
+              );
             }
           });
 
@@ -332,35 +339,30 @@ router.post(
           req.end();
         });
 
-      const processedImagePath = await processedImagePromise();
+      const processedImageUrl = await processedImagePromise();
 
-      const processedImageUpload = await cloudinary.uploader.upload(
-        processedImagePath,
-        { folder: "processed_images" }
-      );
-
-      fs.unlinkSync(processedImagePath);
-
+      // Update cart item if cartItemId is provided
       if (cartItemId) {
         const cartItem = await CartItem.findById(cartItemId);
 
         if (!cartItem) {
           return res
             .status(404)
-            .json({ status: false, error: "cart item not found" });
+            .json({ status: false, error: "Cart item not found" });
         }
 
-        cartItem.imageFile = processedImageUpload.secure_url;
+        cartItem.imageFile = processedImageUrl;
         await cartItem.save();
       }
-      // console.log()
+
+      // Respond with success
       return res.status(200).json({
         status: true,
-        message: "background removed successfully",
-        processedImageUrl: processedImageUpload.secure_url,
+        message: "Background removed successfully",
+        processedImageUrl,
       });
     } catch (error) {
-      console.error("failed to remove background", error);
+      console.error("Failed to remove background", error);
       return res.status(500).json({ status: false, error: error.message });
     }
   }
