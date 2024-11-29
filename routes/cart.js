@@ -296,7 +296,7 @@ router.post(
       } else {
         imageSource = imageUrl;
       }
-
+      console.log(process.env.PHOTOROOM_API, "thisisphotoroomaoi");
       const editParams =
         "background.color=transparent&background.scaling=fill&outputSize=1000x1000&padding=0.1";
       const options = {
