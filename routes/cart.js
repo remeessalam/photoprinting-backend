@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const https = require("https");
+const fs = require("fs");
 const CartItem = require("../model/cartItemModel");
 const User = require("../model/userModel");
 require("dotenv").config();
@@ -244,5 +246,99 @@ router.delete("/delete/:cartItemId", async (req, res) => {
     return res.status(500).json({ status: false, error: "error" });
   }
 });
+
+router.post(
+  "/removebackground",
+  upload.single("imageFile"),
+  async (req, res) => {
+    try {
+      const { imageUrl } = req.body;
+      const file = req.file;
+
+      if (!file && !imageUrl) {
+        return res
+          .status(400)
+          .json({ status: false, error: "No image file or URL provided" });
+      }
+
+      let imageSource;
+
+      if (file) {
+        const uploadPromise = () =>
+          new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              { folder: "temp_images" },
+              (error, result) => {
+                if (error) return reject(error);
+                resolve(result.secure_url);
+              }
+            );
+            uploadStream.end(file.buffer);
+          });
+
+        imageSource = await uploadPromise();
+      } else {
+        imageSource = imageUrl;
+      }
+
+      const editParams =
+        "background.color=transparent&background.scaling=fill&outputSize=1000x1000&padding=0.1";
+      const options = {
+        hostname: "image-api.photoroom.com",
+        port: 443,
+        path: `/v2/edit?${editParams}&imageUrl=${encodeURIComponent(
+          imageSource
+        )}`,
+        method: "GET",
+        headers: {
+          "x-api-key": "sandbox_eea46613d68136e2a7f0e1a74a4e4d6048d8803b",
+        },
+      };
+
+      const processedImagePromise = () =>
+        new Promise((resolve, reject) => {
+          const req = https.request(options, (res) => {
+            if (res.statusCode === 200) {
+              const filePath = `processed_image_${Date.now()}.jpg`;
+              const fileStream = fs.createWriteStream(filePath);
+              res.pipe(fileStream);
+
+              fileStream.on("finish", () => {
+                fileStream.close();
+                resolve(filePath);
+              });
+            } else {
+              reject(
+                new Error(
+                  `PhotoRoom API failed with status code ${res.statusCode}`
+                )
+              );
+            }
+          });
+
+          req.on("error", (error) => reject(error));
+          req.end();
+        });
+
+      const processedImagePath = await processedImagePromise();
+
+      const processedImageUpload = await cloudinary.uploader.upload(
+        processedImagePath,
+        { folder: "processed_images" }
+      );
+
+      fs.unlinkSync(processedImagePath);
+
+      return res.status(200).json({
+        status: true,
+        message: "Background removed successfully",
+        processedImageUrl: processedImageUpload.secure_url,
+      });
+    } catch (error) {
+      console.error("Error in /removebackground:", error);
+      return res.status(500).json({ status: false, error: error.message });
+    }
+  }
+);
 
 module.exports = router;
