@@ -307,7 +307,7 @@ router.post(
         )}`,
         method: "GET",
         headers: {
-          "x-api-key": "sandbox_eea46613d68136e2a7f0e1a74a4e4d6048d8803b",
+          "x-api-key": process.env.PHOTOROOM_API,
         },
       };
 
