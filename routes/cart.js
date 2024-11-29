@@ -48,14 +48,13 @@ const validateFieldsByCategory = (category, data) => {
 // add to cart
 router.post("/create", upload.single("imageFile"), async (req, res) => {
   try {
-    const { userId, size, quantity, amount, category, brand } = req.body;
+    const { userId, size, quantity, amount, category, brand, imageUrl } =
+      req.body;
     console.log(req.body);
     const file = req.file;
 
-    if (!file) {
-      return res
-        .status(400)
-        .json({ status: false, error: "No image file uploaded" });
+    if (!file && !imageUrl) {
+      return res.status(400).json({ status: false, error: "please add image" });
     }
 
     const validationError = validateFieldsByCategory(category, req.body);
@@ -63,31 +62,35 @@ router.post("/create", upload.single("imageFile"), async (req, res) => {
       return res.status(400).json({ status: false, error: validationError });
     }
 
-    const uploadPromise = () =>
-      new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            public_id: `cart_items/${userId}_${Date.now()}`,
-            folder: "cart_items",
-          },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
+    let imageSource;
 
-        uploadStream.end(file.buffer);
-      });
+    if (file) {
+      const uploadPromise = () =>
+        new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              public_id: `cart_items/${userId}_${Date.now()}`,
+              folder: "cart_items",
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+          uploadStream.end(file.buffer);
+        });
 
-    const uploadResult = await uploadPromise();
-
-    const imageUrl = uploadResult.secure_url;
+      const uploadResult = await uploadPromise();
+      imageSource = uploadResult.secure_url;
+    } else {
+      imageSource = imageUrl;
+    }
 
     const newCartItem = new CartItem({
       userId,
       size,
       quantity,
-      imageFile: imageUrl,
+      imageFile: imageSource,
       amount,
       category,
       brand,
@@ -107,6 +110,7 @@ router.post("/create", upload.single("imageFile"), async (req, res) => {
       "-createdAt -updatedAt"
     );
     console.log(cartItem, "cart item created");
+
     return res.status(201).json({
       status: true,
       message: "Item added to cart successfully",
