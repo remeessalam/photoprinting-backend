@@ -353,7 +353,7 @@ router.post(
         cartItem.imageFile = processedImageUpload.secure_url;
         await cartItem.save();
       }
-
+      // console.log()
       return res.status(200).json({
         status: true,
         message: "background removed successfully",
