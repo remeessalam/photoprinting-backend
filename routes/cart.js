@@ -219,7 +219,8 @@ router.put(
       if (file) cartItem.imageFile = imageUrl;
       if (amount) cartItem.amount = amount;
       if (brand) cartItem.brand = brand;
-      if (isBackgroundRemoved) cartItem.brand = isBackgroundRemoved;
+      if (isBackgroundRemoved)
+        cartItem.isBackgroundRemoved = isBackgroundRemoved;
 
       await cartItem.save();
 
