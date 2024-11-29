@@ -48,8 +48,16 @@ const validateFieldsByCategory = (category, data) => {
 // add to cart
 router.post("/create", upload.single("imageFile"), async (req, res) => {
   try {
-    const { userId, size, quantity, amount, category, brand, imageUrl } =
-      req.body;
+    const {
+      userId,
+      size,
+      quantity,
+      amount,
+      category,
+      brand,
+      imageUrl,
+      isBackgroundRemoved,
+    } = req.body;
     console.log(req.body);
     const file = req.file;
 
@@ -94,6 +102,7 @@ router.post("/create", upload.single("imageFile"), async (req, res) => {
       amount,
       category,
       brand,
+      isBackgroundRemoved,
     });
 
     await newCartItem.save();
@@ -166,7 +175,8 @@ router.put(
   async (req, res) => {
     try {
       const cartItemId = req.params.cartItemId;
-      const { size, quantity, amount, category, brand } = req.body;
+      const { size, quantity, amount, category, brand, isBackgroundRemoved } =
+        req.body;
       const file = req.file;
       console.log(req.body);
       let imageUrl;
@@ -209,6 +219,7 @@ router.put(
       if (file) cartItem.imageFile = imageUrl;
       if (amount) cartItem.amount = amount;
       if (brand) cartItem.brand = brand;
+      if (isBackgroundRemoved) cartItem.brand = isBackgroundRemoved;
 
       await cartItem.save();
 

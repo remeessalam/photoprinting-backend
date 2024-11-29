@@ -28,6 +28,10 @@ const cartItemSchema = new mongoose.Schema(
     brand: {
       type: String,
     },
+    isBackgroundRemoved: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
