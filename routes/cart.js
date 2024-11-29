@@ -154,7 +154,10 @@ router.get("/get/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const user = await User.findById(userId).populate("cartItems");
+    const user = await User.findById(userId).populate({
+      path: "cartItems",
+      options: { sort: { createdAt: -1 } },
+    });
     if (!user) {
       return res.status(404).json({ status: false, error: "User not found" });
     }
