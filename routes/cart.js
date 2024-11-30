@@ -14,9 +14,9 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-
+//for redeploy
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 const validateFieldsByCategory = (category, data) => {
   if (category === "STICKER_PRINTING") {
