@@ -332,7 +332,7 @@ router.post(
             if (res.statusCode === 200) {
               res.pipe(cloudinaryUploadStream); // Stream directly to Cloudinary
             } else {
-              console.log(res.statusCode, "htisisereroer");
+              // console.log(res.statusCode, "htisisereroer");
               reject(
                 new Error(`PhotoRoom API failed with status ${res.statusCode}`)
               );
