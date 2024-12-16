@@ -12,7 +12,7 @@ const templateSchema = new mongoose.Schema(
     template: {
       type: Object, 
       required: true, 
-    },
+    }
   },
   { timestamps: true }
 );
