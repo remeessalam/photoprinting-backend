@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const user = require("./routes/user");
 const cart = require("./routes/cart");
+const template = require('./routes/template');
 const cors = require("cors");
 require("dotenv").config();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 app.use("/", user);
 app.use("/cart", cart);
+app.use('/template', template);
 
 // Database connection and server start
 const PORT = 7070;
