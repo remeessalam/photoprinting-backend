@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 });
 app.use("/", user);
 app.use("/cart", cart);
-app.use('/template', template);
+app.use('/templates', template);
 
 // Database connection and server start
 const PORT = 7070;
