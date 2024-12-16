@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 app.use(
   cors({
-    origin: "https://copymudralanka-react.vercel.app", // Allow only your frontend origin
+    origin: "*", // Allow only your frontend origin
   })
 );
 
