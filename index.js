@@ -32,7 +32,7 @@ app.use("/cart", cart);
 app.use("/templates", template);
 
 // Database connection and server start
-const PORT = 8080;
+const PORT = 7070;
 mongoose
   .connect(process.env.MONGOURL, {
     useNewUrlParser: true,
