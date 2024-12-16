@@ -15,12 +15,6 @@ app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-app.use(
-  cors({
-    origin: "*", // Allow only your frontend origin
-  })
-);
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   if (err.type === "entity.too.large") {
