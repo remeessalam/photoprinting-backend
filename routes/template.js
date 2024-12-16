@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const templateSchema = require("../model/templateModel"); 
 
-router.post("/templates", async (req, res) => {
+router.post("/create", async (req, res) => {
   try {
     const { name, template } = req.body;
 
@@ -18,7 +18,7 @@ router.post("/templates", async (req, res) => {
   }
 });
 
-router.get("/templates", async (req, res) => {
+router.get("/get-templates", async (req, res) => {
   try {
     const templates = await templateSchema.find();
     res.status(200).json({ status: true, templates });
@@ -28,7 +28,7 @@ router.get("/templates", async (req, res) => {
   }
 });
 
-router.get("/templates/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -44,7 +44,7 @@ router.get("/templates/:id", async (req, res) => {
   }
 });
 
-router.put("/templates/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { name, template } = req.body;
@@ -70,7 +70,7 @@ router.put("/templates/:id", async (req, res) => {
   }
 });
 
-router.delete("/templates/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
