@@ -1,21 +1,27 @@
-const mongoose = require("mongoose");
-const { type } = require("express/lib/response");
+const mongoose = require('mongoose');
 
-// Define the schema for templates
-const templateSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true, 
-      trim: true, 
-    },
-    template: {
-      type: Object, 
-      required: true, 
-    }
+const templateSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
   },
-  { timestamps: true }
-);
+  fileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
+  contentType: {
+    type: String,
+    required: true
+  },
+  originalName: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
 
-// Export the model
-module.exports = mongoose.model("templates", templateSchema);
+module.exports = mongoose.model('templates', templateSchema);
