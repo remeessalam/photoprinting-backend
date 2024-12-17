@@ -18,6 +18,10 @@ const templateSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  base64_image: {
+    type: String,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

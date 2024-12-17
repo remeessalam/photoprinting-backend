@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.use(bodyParser.json());
 const corsOptions = {
-  origin: "https://copymudralanka-react.vercel.app", // Replace with your frontend domain
+  origin: ["https://copymudralanka-react.vercel.app", "http://localhost:3000"], // Replace with your frontend domain
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true, // Allow cookies if needed
@@ -30,7 +30,7 @@ app.use("/cart", cart);
 app.use("/templates", template);
 
 // Database connection and server start
-const PORT = 7070;
+const PORT = 8080;
 mongoose
   .connect(process.env.MONGOURL)
   .then(() => {
@@ -39,4 +39,5 @@ mongoose
   })
   .catch((err) => {
     console.error("Error connecting to database:", err);
+
   });
