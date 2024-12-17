@@ -32,10 +32,7 @@ app.use("/templates", template);
 // Database connection and server start
 const PORT = 7070;
 mongoose
-  .connect(process.env.MONGOURL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGOURL)
   .then(() => {
     console.log("Database connected");
     app.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
