@@ -31,15 +31,15 @@ const handleError = (res, error, message = "Internal server error", statusCode =
     error: error.message 
   });
 };
-
 router.post("/create", upload.single("file"), async (req, res) => {
   try {
-    const { file, body: { name } } = req;
+    const { file, body: { name, base64_image } } = req;
 
     // Debug logs
     console.log("Received file:", file);
     console.log("File buffer exists:", !!file?.buffer);
     console.log("File buffer length:", file?.buffer?.length);
+    console.log("Base64 image length:", base64_image ? base64_image.length : "No base64 image");
 
     // Validate input
     if (!file) {
@@ -72,6 +72,7 @@ router.post("/create", upload.single("file"), async (req, res) => {
             contentType: file.mimetype,
             name,
             uploadedAt: new Date(),
+            base64_image, // Add base64 image to metadata
           },
         });
 
@@ -118,6 +119,7 @@ router.post("/create", upload.single("file"), async (req, res) => {
         name,
         contentType: file.mimetype,
         originalName: file.originalname,
+        base64_image: base64_image, // Save base64 image directly in the record
       });
 
       // Respond with success
@@ -127,6 +129,7 @@ router.post("/create", upload.single("file"), async (req, res) => {
           id: template._id,
           name: template.name,
           fileId: template.fileId,
+          base64_image: template.base64_image, // Include base64 image in the response
         },
       });
 
@@ -232,7 +235,8 @@ router.get("/get-templates", async (req, res) => {
       name: file.metadata?.name || file.filename,
       fileId: file._id,
       contentType: file.metadata?.contentType || 'application/octet-stream',
-      originalName: file.filename
+      originalName: file.filename,
+      base64Image: file.metadata?.base64_image || null,
     }));
 
     res.status(200).json({
