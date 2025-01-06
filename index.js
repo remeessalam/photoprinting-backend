@@ -16,7 +16,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true, // Allow cookies if needed
 };
-
+console.log("refresh");
 app.use(cors(corsOptions)); // Use CORS with options
 
 app.use(express.json({ limit: "50mb" }));
@@ -39,5 +39,4 @@ mongoose
   })
   .catch((err) => {
     console.error("Error connecting to database:", err);
-
   });
