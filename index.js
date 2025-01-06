@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 const corsOptions = {
   // origin: ["https://copymudralanka-react.vercel.app", "http://localhost:3000"], // Replace with your frontend domain
-  origin: ["https://mudralanka-react.vercel.app/", "http://localhost:3000"], // Replace with your frontend domain
+  origin: ["https://mudralanka-react.vercel.app", "http://localhost:3000"], // Replace with your frontend domain
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true, // Allow cookies if needed
