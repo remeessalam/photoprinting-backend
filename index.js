@@ -11,19 +11,14 @@ app.use(express.json());
 
 app.use(bodyParser.json());
 const corsOptions = {
-  origin: (origin, callback) => {
-    // If there is no origin (e.g. non-browser requests), allow it.
-    if (!origin) return callback(null, true);
-    // Otherwise, echo back the origin from the request.
-    // This allows requests from any origin while using credentials.
-    return callback(null, origin);
-  },
+  // origin: ["https://copymudralanka-react.vercel.app", "http://localhost:3000"], // Replace with your frontend domain
+  origin: ["https://mudralanka-react.vercel.app", "http://localhost:3000"], // Replace with your frontend domain
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
+  credentials: true, // Allow cookies if needed
 };
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests
+console.log("refresh");
+app.use(cors(corsOptions)); // Use CORS with options
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
