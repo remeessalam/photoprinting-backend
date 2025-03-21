@@ -31,95 +31,67 @@ const handleError = (res, error, message = "Internal server error", statusCode =
     error: error.message 
   });
 };
-router.post("/create", upload.single("file"), async (req, res) => {
+
+router.post("/create", upload.fields([{ name: "file" }, { name: "jsonFile" }]), async (req, res) => {
   try {
-    const { file, body: { name, base64_image } } = req;
+    const { files, body: { name } } = req;
+    const file = files?.file?.[0];
+    const jsonFile = files?.jsonFile?.[0];
 
     // Debug logs
-    console.log("Received file:", file);
-    console.log("File buffer exists:", !!file?.buffer);
-    console.log("File buffer length:", file?.buffer?.length);
-    console.log("Base64 image length:", base64_image ? base64_image.length : "No base64 image");
+    console.log("Received file:", file?.originalname);
+    console.log("Received JSON file:", jsonFile?.originalname);
 
     // Validate input
     if (!file) {
-      return res.status(400).json({
-        status: false,
-        message: "File is required.",
-      });
+      return res.status(400).json({ status: false, message: "File is required." });
+    }
+
+    if (!jsonFile) {
+      return res.status(400).json({ status: false, message: "JSON file is required." });
     }
 
     if (!name) {
-      return res.status(400).json({
-        status: false,
-        message: "Template name is required.",
-      });
+      return res.status(400).json({ status: false, message: "Template name is required." });
     }
 
     // Create GridFS bucket
     const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 
-    // Promisified file upload with more robust error handling
-    const uploadFileToGridFS = () => {
+    // Function to upload files to GridFS
+    const uploadFileToGridFS = (fileBuffer, fileName, contentType) => {
       return new Promise((resolve, reject) => {
-        // Create a readable stream from the buffer
         const bufferStream = new stream.PassThrough();
-        bufferStream.end(file.buffer);
+        bufferStream.end(fileBuffer);
 
-        // Open upload stream
-        const uploadStream = bucket.openUploadStream(file.originalname, {
-          metadata: {
-            contentType: file.mimetype,
-            name,
-            uploadedAt: new Date(),
-            base64_image, // Add base64 image to metadata
-          },
+        const uploadStream = bucket.openUploadStream(fileName, {
+          metadata: { contentType, name, uploadedAt: new Date() },
         });
 
-        // Pipe the buffer stream to GridFS upload stream
         bufferStream.pipe(uploadStream);
 
-        // Tracking upload progress
-        let uploadedBytes = 0;
-        bufferStream.on('data', (chunk) => {
-          uploadedBytes += chunk.length;
-          console.log(`Uploaded ${uploadedBytes} bytes`);
-        });
-
-        // Handle errors
-        uploadStream.on('error', (err) => {
-          console.error("GridFS Upload Stream Error:", err);
-          reject(err);
-        });
-
-        uploadStream.on('finish', () => {
-          console.log("Upload stream finished");
-          // Use the ID from uploadStream
-          resolve(uploadStream.id);
-        });
+        uploadStream.on("error", (err) => reject(err));
+        uploadStream.on("finish", () => resolve(uploadStream.id));
       });
     };
 
     try {
-      // Upload file to GridFS
-      const fileId = await uploadFileToGridFS();
+      // Upload main file and JSON file
+      const fileId = await uploadFileToGridFS(file.buffer, file.originalname, file.mimetype);
+      const jsonFileId = await uploadFileToGridFS(jsonFile.buffer, jsonFile.originalname, jsonFile.mimetype);
 
-      // Verify fileId
-      if (!fileId) {
-        console.error("No file ID generated");
-        return res.status(500).json({ 
-          status: false, 
-          message: "File upload failed: No file ID generated" 
-        });
+      // Verify file IDs
+      if (!fileId || !jsonFileId) {
+        return res.status(500).json({ status: false, message: "File upload failed" });
       }
 
       // Create template record
       const template = await TemplateModel.create({
         fileId,
+        jsonFileId, // Store JSON file ID
         name,
         contentType: file.mimetype,
         originalName: file.originalname,
-        base64_image: base64_image, // Save base64 image directly in the record
       });
 
       // Respond with success
@@ -129,26 +101,18 @@ router.post("/create", upload.single("file"), async (req, res) => {
           id: template._id,
           name: template.name,
           fileId: template.fileId,
-          base64_image: template.base64_image, // Include base64 image in the response
+          jsonFileId: template.jsonFileId, // Return JSON file ID
         },
       });
 
     } catch (err) {
       console.error("Upload or template creation error:", err);
-      res.status(500).json({ 
-        status: false, 
-        message: "Failed to upload file or create template",
-        error: err.message 
-      });
+      res.status(500).json({ status: false, message: "Failed to upload files", error: err.message });
     }
 
   } catch (err) {
     console.error("Server error:", err);
-    res.status(500).json({ 
-      status: false, 
-      message: "Server error",
-      error: err.message 
-    });
+    res.status(500).json({ status: false, message: "Server error", error: err.message });
   }
 });
 
