@@ -237,12 +237,18 @@ router.get("/get-templates", async (req, res) => {
   try {
     console.log("call reached");
     // Fetch files directly from gfs.files collection
-    const files = await mongoose.connection.db
-      ?.collection("fs.files")
+    // Check if MongoDB connection is established
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error("Database not connected");
+    }
+
+    const db = mongoose.connection.db;
+
+    // Access the collection directly without optional chaining
+    const files = await db
+      .collection("fs.files")
       .find({ "metadata.contentType": "application/json" })
       .toArray();
-    // .sort({ _id: -1 })
-    // .limit(10)
 
     if (files.length === 0) {
       return res.status(404).json({
