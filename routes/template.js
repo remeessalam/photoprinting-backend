@@ -236,9 +236,9 @@ router.get("/find/:fileId", async (req, res) => {
 router.get("/get-templates", async (req, res) => {
   try {
     console.log("call reached");
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error("Database not connected");
-    }
+    // if (mongoose.connection.readyState !== 1) {
+    //   throw new Error("Database not connected");
+    // }
     // Fetch files directly from gfs.files collection
     const files = await mongoose.connection.db
       .collection("fs.files")
