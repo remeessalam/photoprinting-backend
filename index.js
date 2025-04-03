@@ -36,8 +36,11 @@ app.use("/templates", template);
 
 // Database connection and server start
 const PORT = 8080;
+// .connect(process.env.MONGOURL)
 mongoose
-  .connect(process.env.MONGOURL)
+  .connect(
+    "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting"
+  )
   .then(() => {
     console.log("Database connected");
     app.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
