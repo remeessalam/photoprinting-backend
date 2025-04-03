@@ -6,10 +6,10 @@ const templateSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  // fileId: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   required: true,
-  // },
+  fileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
   contentType: {
     type: String,
     required: true,
