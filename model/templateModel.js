@@ -1,31 +1,31 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const templateSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
-  fileId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
+  // fileId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   required: true,
+  // },
   contentType: {
     type: String,
-    required: true
+    required: true,
   },
   originalName: {
     type: String,
-    required: true
+    required: true,
   },
   base64_image: {
     type: String,
-    required: true
+    required: false,
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('templates', templateSchema);
+module.exports = mongoose.model("templates", templateSchema);
