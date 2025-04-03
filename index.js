@@ -39,9 +39,10 @@ app.use("/templates", template);
 const PORT = 8080;
 // .connect(process.env.MONGOURL)
 // "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting"
+// "mongodb+srv://remeessalam:surumiremees1@cluster0.6ncimah.mongodb.net/photoprinting"
 mongoose
   .connect(
-    "mongodb+srv://remeessalam:surumiremees1@cluster0.6ncimah.mongodb.net/photoprinting"
+    "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting"
   )
   .then(() => {
     console.log("Database connected");
