@@ -63,4 +63,4 @@ mongoose
 
 module.exports = app;
 
-// module.exports = serverless(app);
+module.exports = serverless(app);
