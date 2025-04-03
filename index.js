@@ -40,12 +40,16 @@ const PORT = 8080;
 // .connect(process.env.MONGOURL)
 // "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting"
 // "mongodb+srv://remeessalam:surumiremees1@cluster0.6ncimah.mongodb.net/photoprinting"
+// {
+//   serverSelectionTimeoutMS: 30000,
+//   socketTimeoutMS: 45000,
+// }
 mongoose
   .connect(
     "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting",
     {
-      serverSelectionTimeoutMS: 30000,
-      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 60000,
+      socketTimeoutMS: 85000,
     }
   )
   .then(() => {
