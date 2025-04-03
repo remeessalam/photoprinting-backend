@@ -1,4 +1,5 @@
 const express = require("express");
+const serverless = require("serverless-http");
 const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -61,3 +62,5 @@ mongoose
   });
 
 module.exports = app;
+
+module.exports = serverless(app);
