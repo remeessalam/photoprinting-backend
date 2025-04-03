@@ -238,7 +238,7 @@ router.get("/get-templates", async (req, res) => {
     console.log("call reached");
     // Fetch files directly from gfs.files collection
     const files = await mongoose.connection.db
-      .collection("fs.files")
+      ?.collection("fs.files")
       .find({ "metadata.contentType": "application/json" })
       .toArray();
     // .sort({ _id: -1 })
