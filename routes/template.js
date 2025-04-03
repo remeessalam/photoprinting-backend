@@ -240,9 +240,9 @@ router.get("/get-templates", async (req, res) => {
     const files = await mongoose.connection.db
       .collection("fs.files")
       .find({ "metadata.contentType": "application/json" })
-      .sort({ _id: -1 })
-      .limit(10)
       .toArray();
+    // .sort({ _id: -1 })
+    // .limit(10)
 
     if (files.length === 0) {
       return res.status(404).json({

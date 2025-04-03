@@ -36,28 +36,14 @@ app.use("/templates", template);
 
 // Database connection and server start
 const PORT = 8080;
-// mongoose
-//   .connect(process.env.MONGOURL)
-//   .then(() => {
-//     console.log("Database connected");
-//     app.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
-//   })
-//   .catch((err) => {
-//     console.error("Error connecting to database:", err);
-//   });
-// Database connection and server start
-mongoose.connect(process.env.MONGOURL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-mongoose.connection.on("connected", () => {
-  console.log("Database connected");
-  app.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
-});
-
-mongoose.connection.on("error", (err) => {
-  console.error("Error connecting to database:", err);
-});
+mongoose
+  .connect(process.env.MONGOURL)
+  .then(() => {
+    console.log("Database connected");
+    app.listen(PORT, () => console.log(`App listening on port ${PORT}!`));
+  })
+  .catch((err) => {
+    console.error("Error connecting to database:", err);
+  });
 
 module.exports = app;
