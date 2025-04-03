@@ -42,7 +42,11 @@ const PORT = 8080;
 // "mongodb+srv://remeessalam:surumiremees1@cluster0.6ncimah.mongodb.net/photoprinting"
 mongoose
   .connect(
-    "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting"
+    "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting",
+    {
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+    }
   )
   .then(() => {
     console.log("Database connected");
