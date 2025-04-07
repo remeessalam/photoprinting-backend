@@ -59,8 +59,12 @@ mongoose
   .connect(
     "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting?retryWrites=true&w=majority",
     {
-      serverSelectionTimeoutMS: 60000,
-      socketTimeoutMS: 85000,
+      serverSelectionTimeoutMS: 5000, // Reduce timeout for faster failure detection
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10, // Limit connections for serverless
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      bufferCommands: false, // Disable buffering for serverless
     }
   )
   .then(() => {
