@@ -57,7 +57,7 @@ const HTTPS_PORT = 8443;
 
 mongoose
   .connect(
-    "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting",
+    "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting?retryWrites=true&w=majority",
     {
       serverSelectionTimeoutMS: 60000,
       socketTimeoutMS: 85000,
@@ -90,5 +90,5 @@ mongoose
   });
 
 module.exports = app;
-// app.use("/.netlify/functions/api", router);
+app.use("/.netlify/index", router);
 module.exports.handler = serverless(app);
