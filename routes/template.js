@@ -240,7 +240,27 @@ router.get("/get-templates", async (req, res) => {
     //   throw new Error("Database not connected");
     // }
     // Fetch files directly from gfs.files collection
-    const files = await mongoose.connection.db
+    if (mongoose.connection.readyState !== 1) {
+      // Attempt to connect if not connected
+      await mongoose.connect(
+        "mongodb+srv://boostmysites:VitjZ6rnbbMxk3mf@cluster0.xbd4qdk.mongodb.net/photoprinting?retryWrites=true&w=majority",
+        {
+          serverSelectionTimeoutMS: 5000,
+          socketTimeoutMS: 45000,
+          maxPoolSize: 10,
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        }
+      );
+    }
+
+    // Only now try to access the connection.db
+    const db = mongoose.connection.db;
+    if (!db) {
+      throw new Error("Database connection not fully established");
+    }
+
+    const files = await db
       .collection("fs.files")
       .find({ "metadata.contentType": "application/json" })
       .toArray();
