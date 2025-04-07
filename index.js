@@ -43,17 +43,17 @@ const HTTP_PORT = 8080;
 const HTTPS_PORT = 8443;
 
 // Check if SSL certificates exist
-const keyPath = "/etc/ssl/photoprinting/private.key";
-const certPath = "/etc/ssl/photoprinting/certificate.crt";
-let sslAvailable = false;
+// const keyPath = "/etc/ssl/photoprinting/private.key";
+// const certPath = "/etc/ssl/photoprinting/certificate.crt";
+// let sslAvailable = false;
 
-try {
-  if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
-    sslAvailable = true;
-  }
-} catch (err) {
-  console.log("SSL certificates not found, running in HTTP mode only");
-}
+// try {
+//   if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+//     sslAvailable = true;
+//   }
+// } catch (err) {
+//   console.log("SSL certificates not found, running in HTTP mode only");
+// }
 
 mongoose
   .connect(
@@ -67,28 +67,28 @@ mongoose
     console.log("Database connected");
 
     // Start HTTP server
-    app.listen(HTTP_PORT, "0.0.0.0", () =>
+    app.listen(HTTP_PORT, () =>
       console.log(`HTTP server listening on port ${HTTP_PORT}!`)
     );
 
     // Start HTTPS server if certificates are available
-    if (sslAvailable) {
-      const httpsOptions = {
-        key: fs.readFileSync(keyPath),
-        cert: fs.readFileSync(certPath),
-      };
+    // if (sslAvailable) {
+    //   const httpsOptions = {
+    //     key: fs.readFileSync(keyPath),
+    //     cert: fs.readFileSync(certPath),
+    //   };
 
-      https
-        .createServer(httpsOptions, app)
-        .listen(HTTPS_PORT, "0.0.0.0", () => {
-          console.log(`HTTPS server listening on port ${HTTPS_PORT}!`);
-        });
-    }
+    //   https
+    //     .createServer(httpsOptions, app)
+    //     .listen(HTTPS_PORT, "0.0.0.0", () => {
+    //       console.log(`HTTPS server listening on port ${HTTPS_PORT}!`);
+    //     });
+    // }
   })
   .catch((err) => {
     console.error("Error connecting to database:", err);
   });
 
 module.exports = app;
-
-module.exports = serverless(app);
+// app.use("/.netlify/functions/api", router);
+module.exports.handler = serverless(app);
