@@ -90,5 +90,5 @@ mongoose
   });
 
 module.exports = app;
-app.use("/.netlify/index", router);
+// app.use("/.netlify/index", router);
 module.exports.handler = serverless(app);
