@@ -20,6 +20,7 @@ const corsOptions = {
     "http://localhost:3000",
     "http://localhost:5173",
     "https://copymudralanka-react-26is.vercel.app",
+    "https://backend.mudralanka.com/",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
